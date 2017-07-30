@@ -139,11 +139,12 @@ router.post('/vote', function(req, res, next) {
             card.votesB.push(userId);
           }
         }
+        res.json({success: true, card: card});
         card.save();
       })
     }
     user.save();
-    res.json({success: true})
+    return next();
   })
 })
 
