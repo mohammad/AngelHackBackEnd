@@ -2,12 +2,17 @@ var express = require('express');
 var router = express.Router();
 var models = require('../models.js');
 var _ = require('underscore');
-var Clarifai = require('clarifai');
 var Card = models.Card;
 var User = models.User;
+
+// API set up here
+var Clarifai = require('clarifai');
+var amazon = require('amazon-product-api');
+
 const clarifai = new Clarifai.App({
-     apiKey: 'cdf8edeaf670475681e20d51a228c9ec'
+     apiKey: process.env.CLARIFAI_KEY
 });
+
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
 // Users who are not logged in can see these routes
 
@@ -69,7 +74,7 @@ router.get('/getTenCards/:userId', function(req, res, next) {
           var cardIds = cards.map(function(card) {
             return card._id;
           });
-          var usersCards = user.myCards;
+          var userCards = user.myCards;
           var userSeenCards = user.history;
           // now find cards in cardsIds that are NOT in userCards AND userSeenCards
           var uniqueCards = cardIds.filter(function(cardId) {
@@ -128,6 +133,19 @@ router.post('/vote', function(req, res, next) {
     res.json({success: true})
   })
 })
+
+// router.post('/queryImage', function(req, res, next) {
+//   var image = req.body.image;
+//   clarifai.models.predict('e0be3b9d6a454f0493ac3a30784001ff', req.body.image).then(
+//     function(response) {
+//       console.log(response.outputs[0].data.concepts);
+//       res.json(response.outputs[0].data.concepts);
+//     },
+//     function(err) {
+//       console.error(err);
+//     }
+//   );
+// });
 
 router.post('/uploadcard', function(req, res, next) {
   // console.log("this is req.body in post/uploadcard", req.body)
