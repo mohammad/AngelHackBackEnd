@@ -73,11 +73,18 @@ router.get('/getTenCards/:userId', function(req, res, next) {
           var cardIds = cards.map(function(card) {
             return card._id;
           });
-          var userCards = user.myCards;
-          var userSeenCards = user.history;
+
+          var userCards = user.myCards.map(function(card) {
+            return card._id
+          });
+
+          var userSeenCards = user.history.map(function(card) {
+            return card.card
+          });
+
           // now find cards in cardsIds that are NOT in userCards AND userSeenCards
           var uniqueCards = cardIds.filter(function(cardId) {
-            (userCards.indexOf(cardId) === -1 && userSeenCards.indexOf(cardId) === -1);
+            return (userCards.indexOf(cardId) === -1 && userSeenCards.indexOf(cardId) === -1);
           });
           // shuffles cards and sends to front end
           var shuffledCards = _.shuffle(uniqueCards);
