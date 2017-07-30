@@ -16,7 +16,7 @@ const clarifai = new Clarifai.App({
 // Users who are not logged in can see these routes
 
 router.get('/', function(req, res, next) {
-  res.json({test: 'test'});
+  res.send('Yo');
 });
 
 router.post('/getUser', function(req, res, next) {
@@ -150,9 +150,11 @@ router.post('/queryImage', function(req, res, next) {
   clarifai.models.predict('e0be3b9d6a454f0493ac3a30784001ff', req.body.image).then(
     function(response) {
       var items = response.outputs[0].data.concepts;
+      var itemNames = [];
       var itemURLS = items.map(function(item) {
         if(item.value > 0.45) {
           // parse items
+          itemNames.push(item.name);
           var itemSearch = item.name.split('/').join('').split(' ').join('%20');
           var itemURL = `https://www.amazon.com/s/field-keywords=${itemSearch}`;
           return itemURL;
@@ -160,7 +162,7 @@ router.post('/queryImage', function(req, res, next) {
       }).filter(function(item) {
         return item
       })
-      res.json(itemURLS);
+      res.json({itemURLS: itemURLS, itemNames: itemNames});
     },
     function(err) {
       console.error(err);
@@ -170,18 +172,25 @@ router.post('/queryImage', function(req, res, next) {
 
 router.post('/getmyhistory', function(req, res, next){
   var id = req.body.id;
-  User.findById(id).populate('history.card').exec()
-  .then(user => {
-    var tempArr = [];
-    user.history.forEach(card => {
-      if (card.myVote !== 0 && card.card.finalDecision !== 0){
-        tempArr.push(card);
+  User.findById(id, function(err, user) {
+    var votedCard = user.history.map(function(card) {
+      if(card.myVote !== 0) {
+        return card
       }
-    });
-    res.json({cards: tempArray});
-  })
-  .catch(err => {
-    console.log(err)
+    })
+    var finalizedCards = [];
+    votedCard.map(function(card) {
+      Card.findById(card.card, function(err, card) {
+        if(!card) {
+          console.log('damn');
+        }
+        else if(card.finalDecision !== 0) {
+          finalizedCards.push(card)
+        }
+      })
+    })
+    res.json({cards: finalizedCards});
+
   })
 })
 
