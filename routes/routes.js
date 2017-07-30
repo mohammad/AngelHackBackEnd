@@ -144,7 +144,6 @@ router.post('/vote', function(req, res, next) {
       })
     }
     user.save();
-    return next();
   })
 })
 
