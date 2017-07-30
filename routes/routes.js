@@ -58,7 +58,7 @@ router.get('/getTenCards/:userId', function(req, res, next) {
       if(user.myCards.length === 0 && user.history.length === 0) {
         Card.find({}, function(err, cards) {
           var shuffledCards = _.shuffle(cards);
-          var tenCards = shuffledCards.slice(0, 10);
+          var tenCards = shuffledCards.slice(0, 30);
           // shuffles cards and sends to front end
           res.json({cards: tenCards, stylePoints: user.stylePoints});
         });
@@ -72,12 +72,12 @@ router.get('/getTenCards/:userId', function(req, res, next) {
           var usersCards = user.myCards;
           var userSeenCards = user.history;
           // now find cards in cardsIds that are NOT in userCards AND userSeenCards
-          var uniqueCards = cardsIds.filter(function(cardId) {
+          var uniqueCards = cardIds.filter(function(cardId) {
             (cardId.indexOf(userCards) === -1 && cardId.indexOf(userSeenCards) === -1);
           });
           // shuffles cards and sends to front end
           var shuffledCards = _.shuffle(uniqueCards);
-          var tenCards = shuffledCards.slice(0, 10);
+          var tenCards = shuffledCards.slice(0, 30);
           res.json({cards: tenCards, stylePoints: user.stylePoints})
         });
       }
