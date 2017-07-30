@@ -7,7 +7,6 @@ var User = models.User;
 
 // API set up here
 var Clarifai = require('clarifai');
-var amazon = require('amazon-product-api');
 
 const clarifai = new Clarifai.App({
      apiKey: process.env.CLARIFAI_KEY
