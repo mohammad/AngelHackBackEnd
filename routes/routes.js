@@ -89,8 +89,6 @@ router.get('/getTenCards/:userId', function(req, res, next) {
             return (uniqueCardIds.indexOf(card._id) !== -1)
           })
 
-          console.log(uniqueCards);
-
           var shuffledCards = _.shuffle(uniqueCards);
           var tenCards = shuffledCards.slice(0, 30);
 
@@ -147,18 +145,22 @@ router.post('/vote', function(req, res, next) {
   })
 })
 
-// router.post('/queryImage', function(req, res, next) {
-//   var image = req.body.image;
-//   clarifai.models.predict('e0be3b9d6a454f0493ac3a30784001ff', req.body.image).then(
-//     function(response) {
-//       console.log(response.outputs[0].data.concepts);
-//       res.json(response.outputs[0].data.concepts);
-//     },
-//     function(err) {
-//       console.error(err);
-//     }
-//   );
-// });
+router.post('/queryImage', function(req, res, next) {
+  var image = req.body.image;
+  clarifai.models.predict('e0be3b9d6a454f0493ac3a30784001ff', req.body.image).then(
+    function(response) {
+      var items = response.outputs[0].data.concepts;
+      items.map(function(item) {
+        if(item.value > 0.45)
+        console.log('heres an item' ,item.name, item.value);
+      })
+      res.json(response.outputs[0].data.concepts);
+    },
+    function(err) {
+      console.error(err);
+    }
+  );
+});
 
 router.post('/uploadcard', function(req, res, next) {
   // console.log("this is req.body in post/uploadcard", req.body)
