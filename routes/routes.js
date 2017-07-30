@@ -150,17 +150,40 @@ router.post('/queryImage', function(req, res, next) {
   clarifai.models.predict('e0be3b9d6a454f0493ac3a30784001ff', req.body.image).then(
     function(response) {
       var items = response.outputs[0].data.concepts;
-      items.map(function(item) {
-        if(item.value > 0.45)
-        console.log('heres an item' ,item.name, item.value);
+      var itemURLS = items.map(function(item) {
+        if(item.value > 0.45) {
+          // parse items
+          var itemSearch = item.name.split('/').join('').split(' ').join('%20');
+          var itemURL = `https://www.amazon.com/s/field-keywords=${itemSearch}`;
+          return itemURL;
+        }
+      }).filter(function(item) {
+        return item
       })
-      res.json(response.outputs[0].data.concepts);
+      res.json(itemURLS);
     },
     function(err) {
       console.error(err);
     }
   );
 });
+
+router.post('/getmyhistory', function(req, res, next){
+  var id = req.body.id;
+  User.findById(id).populate('history.card').exec()
+  .then(user => {
+    var tempArr = [];
+    user.history.forEach(card => {
+      if (card.myVote !== 0 && card.card.finalDecision !== 0){
+        tempArr.push(card);
+      }
+    });
+    res.json({cards: tempArray});
+  })
+  .catch(err => {
+    console.log(err)
+  })
+})
 
 router.post('/uploadcard', function(req, res, next) {
   // console.log("this is req.body in post/uploadcard", req.body)
@@ -234,7 +257,6 @@ router.get('/getcard/:id', function(req, res, next){
     }
   })
 })
-
 
 router.post('/postclosecard', function(req, res, next) {
   var id = req.body.cardId;
