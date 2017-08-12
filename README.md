@@ -1,10 +1,9 @@
 # Outfit
+## Finalist for Angel Hack Silicon Valley 2017
 
-Mobile A/B testing platform for retail items and apparel. 
+Mobile A/B testing platform for retail items and apparel.
 
-Finalist for Angel Hack Silicon Valley 2017
-
-## Built With
+## Technologies User
 
 * Clarif.AI
 * React Native
